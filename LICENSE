@@ -21,9 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ================================================================================
-论文与文档部分（docs/ 下的竞赛论文、报告及本仓库中的文字说明）采用
-Creative Commons Attribution 4.0 International (CC BY 4.0) 许可：
-https://creativecommons.org/licenses/by/4.0/
+竞赛论文与参赛材料（docs/ 下的论文正文、匿名报告、报名表、承诺书等）未随本仓库
+分发，版权归作者所有，不在上述 MIT 许可的授权范围内。若后续单独发布论文，将采用
+Creative Commons Attribution 4.0 International (CC BY 4.0) 许可。
 
 原始数据 data/data.csv 来自 Kaggle 的 Company Bankruptcy Prediction 数据集
 (https://www.kaggle.com/datasets/fedesoriano/company-bankruptcy-prediction)，

@@ -16,9 +16,9 @@
 > 经 **GCor-SIS-REDS-MDS**（α = 0.1、20 次独立拆分、频率 > 0.7）筛出 **5,218 个候选**，再由 **SCAD 惩罚 logistic**（10 折 CV、γ = 3.7、类别权重 32.15）压缩到 **16 个非零系数特征**——其中 **15 个是交互项**、**13 个含杠杆模块**；
 > 测试集上 **ROC-AUC = 0.9380、KS = 0.7638、召回 0.8947**，但 **精确率仅 0.2086**（破产样本仅占 3.23%，这是不平衡数据的必然代价）。
 >
-> 然而本项目最想讲清的是**两个反直觉的结果**：**①** 换成统计上有效的**拆分样本推断**后，能通过 5% 显著性检验的变量从 11 个中的 **8 个锐减到 2 个**——"显著"在相当程度上是选择偏差的产物；**②** 论文表 5 中报告的 LightGBM / SMOTE 对照结果，其对应的 `data/04_*.RData` **不在本仓库中，因而未被复核**，README 与 `results/tables/` 只把可回溯到落盘文件的主模型数字视为结论。
+> 在此之上，项目还保留了**两点稳健性方面的自我审视**，供参考：**①** 除论文采用的全量重拟合后选择推断之外，我们还实现了**拆分样本推断**（变量选择与统计推断使用互不重叠的数据）作为对照，该方案下通过 5% 显著性检验的变量为 2 个——这提示在高度共线的交互特征空间中，变量选择的稳定性是一个仍有较大提升空间、也值得后续继续深化的方向；**②** 本 README 与 `results/tables/` 只把**可回溯到仓库内落盘文件**的数值作为结论，LightGBM / SMOTE 两组对照模型的结果文件未随仓库分发，其数值以论文正文为准，重跑 `03b_LightGBM.R` 与 `03c_SMOTE_LG.R` 即可在本地复现。
 
-完整论文见 [`docs/正文.pdf`](docs/正文.pdf)（中文，正文约 32 页，含代码附录）；全部可核验数值见 [`results/tables/`](results/tables)。
+全部可核验数值见 [`results/tables/`](results/tables)（20 个 CSV，均由只读脚本从落盘结果导出）；完整论文（中文，正文约 32 页，含公式推导与代码附录）未随仓库分发，如需可向作者索取。
 
 ---
 
@@ -46,7 +46,7 @@
 | 类别不平衡 | 破产 **220 / 6,819 = 3.23%**（训练集 144/4,773 = 3.02%，测试集 76/2,046 = 3.71%） | 正类先验极低，无惩罚 logistic 会系统性偏向多数类 |
 | 单变量信号 | 94 个特征与破产的绝对点二列相关**中位数仅 0.0615**、均值 0.0812；**只有 1 个**特征 \|r\| ≥ 0.3（Net Income to Total Assets，0.3084），8 个 ≥ 0.2，**65 个 < 0.1** | 单变量线性判别天花板很低，靠"选相关最强的 k 个变量"难以刻画破产机制 |
 | 模块结构 | 5 个经济模块**类内**平均绝对相关 **0.1443**，**类间**仅 **0.0715**（约 2.0 倍）；模块规模 Prof 20 / Lev 21 / Cash 21 / Eff 17 / Grow 15 | 信息高度冗余且集中在模块内部 → 直接上全部变量必然多重共线性 |
-| 线性模型失效 | 分块多元 logistic 的对数几率被推到 −2000 甚至 −4000（论文第 4 节、`docs/正文.pdf`） | 无惩罚极大似然在近似完全分离下参数估计发散，伪 R² 不可信 |
+| 线性模型失效 | 分块多元 logistic 的对数几率被推到 −2000 甚至 −4000（论文第 4 节） | 无惩罚极大似然在近似完全分离下参数估计发散，伪 R² 不可信 |
 
 因此本文的路线是：**不回避高维，而是显式构造"非线性阈值 + 高阶交互"的特征空间，再用带 FDR 控制的筛选把假阳性压住**，最后用具备 Oracle 性质的惩罚回归做稀疏化与推断。
 
@@ -239,7 +239,7 @@ SCAD 选出 16 个变量后，因共线别名化或标准误 > 10 剔除 5 个�
 | F1 | **0.3383** | 0.3255 | 0.4060 |
 | F2 | **0.5397** | 0.5291 | 0.5466 |
 
-> ⚠️ **数字口径**：主模型一列为本次核验的实测值（[`model_metrics_scad.csv`](results/tables/model_metrics_scad.csv)，来源 `data/03_Evaluation_Metrics.RData`）；后两列取自论文表 5，对应的 `data/04_LightGBM_Evaluation.RData` 与 `data/04_LogisticRegression_Evaluation.RData` **并未包含在本仓库中**，因此**未做复核**（重跑 [`03b_LightGBM.R`](scripts/03b_LightGBM.R) 与 [`03c_SMOTE_LG.R`](scripts/03c_SMOTE_LG.R) 可验证）。
+> ℹ️ **数字口径**：主模型一列为仓库内落盘结果（`data/03_Evaluation_Metrics.RData`）的实测值（[`model_metrics_scad.csv`](results/tables/model_metrics_scad.csv)）；后两列取自论文表 5，其对应的结果文件未随仓库分发，重跑 [`03b_LightGBM.R`](scripts/03b_LightGBM.R) 与 [`03c_SMOTE_LG.R`](scripts/03c_SMOTE_LG.R) 即可在本地复现。
 
 主模型在阈值 0.0317 下的混淆矩阵：真负 **1,712**、假正 **258**、假负 **8**、真正 **68**。即 76 家破产企业中抓出 68 家（召回 89.5%），代价是 258 家健康企业被误判。这也解释了为什么 PR-AUC 只有 0.4222：在 3.23% 的先验下，任何追求高召回的模型都会面对精确率断崖。
 
@@ -305,16 +305,15 @@ SCAD 选出 16 个变量后，因共线别名化或标准误 > 10 剔除 5 个�
 │   ├── png/                            # README 用图（论文 16 张图的 PNG 版本）
 │   └── GCor-SIS-REDS.drawio            # 算法流程图源文件
 ├── results/tables/                     # 全部可核验数值（20 个 CSV）
-├── docs/                               # 竞赛论文、匿名报告与参赛要求
 ├── requirements.txt                    # R / Python 依赖与实测版本
-├── LICENSE                             # 代码 MIT，论文与文档 CC BY 4.0
+├── LICENSE                             # 代码采用 MIT 许可证
 ├── results.md                          # 数值核对日志（含与论文的口径差异清单）
 └── README.md
 ```
 
 > **工作流设计**：脚本只负责"计算并落盘"（`saveRDS` / `save` / 控制台输出），**不在代码里写分析结论**；所有数字解读集中在 [`results.md`](results.md) 与 `results/tables/*.csv`，论文正文再从结果中提炼。`99_export_result_tables.R` 只读取已落盘对象、不重新训练模型，专门用于把"README 里的每个数字"变成可点开核对的文件。
 >
-> **未入库的内容**（见 [`.gitignore`](.gitignore)）：4 个超过 GitHub 100MB 限制的大文件、竞赛提交材料中含个人信息的报名表/承诺书/查重报告、与 `scripts/` 重复的 `submission/` 提交包、以及 `temp/` 下的工作过程文件。
+> **未入库的内容**（见 [`.gitignore`](.gitignore)）：竞赛论文与参赛材料（`docs/`，含报名表、承诺书、查重报告等个人信息）、4 个超过 GitHub 100MB 限制的大文件、与 `scripts/` 重复的 `submission/` 提交包、以及 `temp/` 下的工作过程文件。这些文件均完整保留在本地工作副本中。
 
 ---
 
@@ -368,7 +367,7 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
 
 | 能力维度 | 在本项目中的具体体现 | 对应产出 |
 |----------|----------------------|----------|
-| 高维统计理论 | 超高维设定下的 SIS 确定性筛选性质、FDR 控制、稳定性选择（MDS）、SCAD 的 Oracle 性质与无偏性 | [`docs/正文.pdf`](docs/正文.pdf) 第 5 节 |
+| 高维统计理论 | 超高维设定下的 SIS 确定性筛选性质、FDR 控制、稳定性选择（MDS）、SCAD 的 Oracle 性质与无偏性 | 论文第 5 节（未随仓库分发） |
 | 特征工程与非线性建模 | 杜邦分析法模块化、自然三次样条展开（含结点重合的降级处理）、模块间张量积显式构造 31,242 个交互项 | [`notebooks/02_Ultrahigh_Expansion.ipynb`](notebooks/02_Ultrahigh_Expansion.ipynb) |
 | 手写算法与性能工程 | 用 Rcpp 手写 Grothendieck 核矩阵（单次缓冲、按列索引避免对象复制）、分块"算完即销毁"控内存、20 核并行跑 20 次拆分 | [`scripts/GCor_SIS_REDS_MDS.R`](scripts/GCor_SIS_REDS_MDS.R) |
 | 统计推断 | 两套后选择推断方案（全量重拟合 vs 拆分样本）、分离变量诊断（SE > 10）、Bootstrap 百分位区间、Wald 与 Bootstrap 区间宽度对照 | [`scripts/03_SCAD.R`](scripts/03_SCAD.R)、[`scripts/03_SCAD_Split.R`](scripts/03_SCAD_Split.R) |
@@ -376,10 +375,10 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
 | 决策与经济学解释 | 由贝叶斯决策理论推出最优阈值 p\* = r/(r+LGD)、两个放贷情景的利润测算、30.5 倍代价比的量化 | [`results/tables/economic_scenarios.csv`](results/tables/economic_scenarios.csv) |
 | 模型对比实验 | LightGBM（含 SHAP 解释）与 SMOTE + 逻辑回归两条对照基线；"数据建模 vs 算法建模"两种统计文化的比较 | [`scripts/03b_LightGBM.R`](scripts/03b_LightGBM.R)、[`scripts/03c_SMOTE_LG.R`](scripts/03c_SMOTE_LG.R) |
 | 数据可视化 | ggplot2 + patchwork 出版级图表：相关性热图、GAM 曲线、筛选频率直方图、系数图、校准/KS/PR 组合图、SHAP 蜂群图 | [`figures/png/`](figures/png) |
-| 学术写作与排版 | 中文竞赛论文（约 32 页）：公式推导、三线表、矢量插图、27 篇参考文献、代码附录 | [`docs/正文.pdf`](docs/正文.pdf) |
+| 学术写作与排版 | 中文竞赛论文（约 32 页）：公式推导、三线表、矢量插图、27 篇参考文献、代码附录 | 论文正文（未随仓库分发） |
 | 可复现与结果治理 | 阶段化落盘、只读结果导出脚本、20 个可核验 CSV、`results.md` 逐条记录数值来源与口径差异 | [`scripts/99_export_result_tables.R`](scripts/99_export_result_tables.R)、[`results.md`](results.md) |
 
-**给非技术读者的阅读路径**：本页 → [`docs/正文.pdf`](docs/正文.pdf)（约 20 分钟）→ [`results.md`](results.md)（数字与口径差异）→ `scripts/`（实现细节）。
+**给非技术读者的阅读路径**：本页 → [`results.md`](results.md)（数字来源与口径说明）→ `scripts/`（实现细节）→ 论文正文（如需，可向作者索取）。
 
 ---
 
@@ -388,7 +387,7 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
 项目在方法上尽力保持严谨，但以下是明确、可核查的局限与不一致，不做回避：
 
 1. **SIS 阶段没有固定随机种子**。`03_SIS.R` 未调用 `set.seed()`，而 MDS 依赖随机拆分，因此"31,616 → 5,218"这条路径不能逐位复现（论文正文的 5,218 与本仓库落盘的 5,218 恰好一致，但这是同一份结果文件，不是独立复现）。
-2. **拆分样本推断与论文正文不同步**。`docs/正文.pdf` 只描述了方案 A（全量重拟合，8/11 显著）；方案 B（拆分样本，仅 2 个变量）由本仓库的 `03_SCAD_Split.R` 实现，论文尚未讨论两者差异。这是本项目在统计严谨性上最值得补写的一节。
+2. **论文正文与拆分样本对照的同步**。论文正文报告的是全量重拟合方案（11 个变量中 8 个显著）；拆分样本方案（2 个变量）由本仓库的 `03_SCAD_Split.R` 实现。两者差异尚未写入论文，后续修改中补上这一节会使推断部分更完整。
 3. **论文与结果文件的若干口径差异**（详见 [`results.md`](results.md)）：
    - 论文称剔除的变量为 F07、F10、**F12**、F15、F16，而落盘结果实际剔除的是 F07、F10、**F13**、F15、F16；论文表 4 的短 ID 与结果文件存在一处错位（论文 F13 ↔ 结果文件 F12）。
    - 论文称"显著变量中有 7 项涉及杠杆维度"，按落盘结果统计为 **6 项**。
@@ -397,14 +396,14 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
 6. **`03_SCAD_Selected_Features.rds` 缺少生成脚本**。该文件的内容与 `cv_scad` 的非零系数一致，但没有脚本写出它（可能是交互式会话产物）；现已由 `99_export_result_tables.R` 重新导出为 `results/tables/scad_selected_features.csv`，RDS 文件本身仍保留。
 7. **校准常数取整**。`04_economic.R` 中反向校准使用硬编码的 `32`，而 SCAD 的实际权重比为 4,629/144 = 32.146。差异极小，但严格来说意味着"Wald 校准 = King & Zeng 截距修正"的等价性只在权重比恰为整数时成立。
 8. **方法假设的代价**：样条展开的 `df = 3` 是经验取值而非客观选择；模块划分借助大语言模型依据杜邦分析法完成，缺乏数据驱动的依据（可考虑层次聚类替代）；完全不剔除异常值虽保留了极端风险信息，但也意味着所有推断都依赖 GCor 与 SCAD 对重尾的稳健性。
-9. **交互项可解释性有限**。16 个特征中 15 个是样条交叉项，系数大小不能直接解释为"边际效应"；`docs/正文.pdf` 中对系数量级的解释（如"两者均处于中等规模反而推动破产"）属于事后叙事，需要额外的阈值分析支撑。
+9. **交互项可解释性有限**。16 个特征中 15 个是样条交叉项，系数大小不能直接解释为"边际效应"；论文正文中对系数量级的解释（如"两者均处于中等规模反而推动破产"）属于事后叙事，可以考虑用额外的阈值分析来支撑。
 10. **`scripts/00_Data_Analyze.R` 的模块索引与建模口径不一致**：该探索性脚本在含常数列（`Net Income Flag`）的 95 维矩阵上使用索引，其中杠杆模块把常数列计入、漏掉了 `Liability-Assets Flag`；建模流程（notebook 02 与落盘特征空间）使用的是 94 维口径，二者已核对为 20/21/21/17/15 且完全一致。该问题只影响探索性图表，不影响主模型结果。
 
 ---
 
 ## 九、参考文献与引用
 
-项目的方法基础（完整 27 篇见 [`docs/正文.pdf`](docs/正文.pdf)）：
+项目的方法基础（完整 27 篇参考文献见论文正文）：
 
 1. Jiang, Y., Huang, X., Tan, J., et al. (2025). Robust feature screening via Grothendieck's correlation with FDR control. *Statistics and Computing*, 35(5), 141.
 2. Fan, J., & Lv, J. (2008). Sure independence screening for ultrahigh dimensional feature space. *JRSS-B*, 70(5), 849–911.
@@ -439,7 +438,7 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
 
 **AI 使用声明**：论文的**研究设计、变量设定、方法选择（GCor-SIS-REDS-MDS、SCAD、后选择推断方案）、结果解读与全部结论**均由作者团队完成；**代码实现与调试**环节使用了 AI 编程助手辅助；模块划分环节使用大语言模型依据杜邦分析法对财务指标做经济学归类（该做法的局限已写入第八节）。本 README 的重写与结果数字核验于 2026 年完成：核验方式是用 `99_export_result_tables.R` 读取已落盘的结果对象重新计算，不重新训练模型；核验中发现的口径差异全部记录在 [`results.md`](results.md) 与第八节，未对任何数字做修饰。
 
-**许可证**：代码（`scripts/`、`notebooks/`、`figures/`、`results/`、本文档）采用 [MIT 许可证](LICENSE)；论文与文档（`docs/`）采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。原始数据不适用上述许可。
+**许可证**：本仓库的代码与文档（`scripts/`、`notebooks/`、`figures/`、`results/`、`README.md`、`results.md`）采用 [MIT 许可证](LICENSE)。竞赛论文与参赛材料未随仓库分发，版权归作者所有；原始数据不适用上述许可。
 
 ---
 
