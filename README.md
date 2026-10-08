@@ -113,20 +113,20 @@
 **第三步，模块间张量积交叉。** 对 5 个模块做两两交叉（C(5,2) = 10 组），每个变量对的两个基函数相乘，得到 31,242 个交互项列。这一步是本项目的核心设计：**不依赖遗传性原则先筛主效应，而是把"纯交互效应"直接放进候选池**。
 
 $$
-X_{\text{ultra}} = \big[\, X \;\big|\; \{\text{ns}_j(x_k)\} \;\big|\; \{\text{ns}_a(x_i)\cdot \text{ns}_b(x_j)\}_{i<j} \,\big], \qquad 94 \to 31{,}616
+X_{\text{ultra}} = \left[\, X \;\middle|\; \{\text{ns}_j(x_k)\} \;\middle|\; \{\text{ns}_a(x_i)\cdot \text{ns}_b(x_j)\}_{i<j} \,\right], \qquad 94 \to 31{,}616
 $$
 
 ### 3.2 GCor-SIS-REDS-MDS：带 FDR 控制的超高维筛选
 
-Jiang 等（2025）以 **Grothendieck 相关**度量特征与响应之间的边际依赖：把 $x$ 与 $y$ 分别映为 $\arcsin\big((x_ix_j+1)/\sqrt{(x_i^2+1)(x_j^2+1)}\big)$ 形式的核矩阵，中心化后求内积平方根得到 $\omega$。它同时捕捉线性和非线性依赖，且对重尾稳健——这正对应本项目"**不做任何缩尾处理**"的选择。
+Jiang 等（2025）以 **Grothendieck 相关**度量特征与响应之间的边际依赖：把 $x$ 与 $y$ 分别映为 $\arcsin\left((x_ix_j+1)/\sqrt{(x_i^2+1)(x_j^2+1)}\right)$ 形式的核矩阵，中心化后求内积平方根得到 $\omega$。它同时捕捉线性和非线性依赖，且对重尾稳健——这正对应本项目"**不做任何缩尾处理**"的选择。
 
 单次筛选把样本随机拆成 $D_1$（2/3）与 $D_2$（1/3），构造
 
 $$
-M_r \;=\; \operatorname{sign}(n_1\omega_1 - n_2\omega_2)\,\max(n_1\omega_1,\; n_2\omega_2)
+M_r \;=\; \mathrm{sign}\left(n_1\omega_1 - n_2\omega_2\right)\,\max\left(n_1\omega_1,\; n_2\omega_2\right)
 $$
 
-再在候选阈值上取满足 $\big(1+\#\{M \le -t\}\big)/\max(\#\{M \ge t\},1) \le \alpha$ 的最小 $t$ 作为截断，从而把错误发现率控制在 $\alpha$ 以内。计算复杂度 $O(np\log n)$，低于 BCor-SIS 与 PC-SIS。
+再在候选阈值上取满足 $\left(1+\#\{M \le -t\}\right)/\max\left(\#\{M \ge t\},\,1\right) \le \alpha$ 的最小 $t$ 作为截断，从而把错误发现率控制在 $\alpha$ 以内。计算复杂度 $O(np\log n)$，低于 BCor-SIS 与 PC-SIS。
 
 **MDS（多重数据拆分）** 是针对单次拆分不稳健的补救：重复 $B=20$ 次独立拆分，记录每个变量被选中的频率 $\Pi_j$，仅保留 $\Pi_j > 0.7$ 的变量（Meinshausen & Bühlmann 2010 的稳定性选择思想）。本项目在 R 中用 **Rcpp 手写核矩阵** + **20 核并行**（`doParallel`/`foreach`）实现，并把频率阈值设得比脚本的 τ = 0.5 更严（0.7），因为落盘结果显示 τ = 0.5 时仍有 12,043 个特征，无法支撑后续 SCAD 的稳定求解。
 
@@ -137,7 +137,7 @@ $$
 对筛选后的 5,218 维候选拟合 SCAD 惩罚 logistic：
 
 $$
-\hat\beta = \arg\min_{\beta}\Big\{ -\frac{1}{n}\sum_{i=1}^{n} w_i\big[y_i \log p_i + (1-y_i)\log(1-p_i)\big] + \sum_{j=1}^{p} p_\lambda(|\beta_j|) \Big\},
+\hat\beta = \arg\min_{\beta}\left\{ -\frac{1}{n}\sum_{i=1}^{n} w_i\left[y_i \log p_i + (1-y_i)\log(1-p_i)\right] + \sum_{j=1}^{p} p_\lambda(|\beta_j|) \right\},
 \qquad p_i = \frac{1}{1+e^{-x_i^\top\beta}}
 $$
 
@@ -256,7 +256,7 @@ SCAD 选出 16 个变量后，因共线别名化或标准误 > 10 剔除 5 个�
 
 ### 4.6 从统计模型到放贷决策
 
-用后验比例对加权模型的输出做**反向概率校准** $\tilde p = \hat p_w / \big(\hat p_w + 32(1-\hat p_w)\big)$，还原物理违约概率；再代入贝叶斯决策理论给出的最优阈值 $p^* = r/(r + \text{LGD})$：
+用后验比例对加权模型的输出做**反向概率校准** $\tilde p = \hat p_w / \left(\hat p_w + 32(1-\hat p_w)\right)$，还原物理违约概率；再代入贝叶斯决策理论给出的最优阈值 $p^* = r/(r + \text{LGD})$：
 
 | 情景 | 最优阈值 | 批准放贷 | 其中违约 | 净利润 |
 |------|----------|----------|----------|--------|
@@ -274,7 +274,7 @@ SCAD 选出 16 个变量后，因共线别名化或标准误 > 10 剔除 5 个�
 ## 五、项目结构
 
 ```
-26tjjm/
+Company-Bankruptcy-Prediction/
 ├── data/                               # 数据与各阶段产物
 │   ├── data.csv                        # 原始数据 6,819 × 96（目标变量 Bankrupt? 在首列）
 │   ├── 01_Train_Data.rds               # 7:3 划分 + 仅用训练集参数标准化（防数据泄露）
@@ -424,7 +424,7 @@ Rscript 99_export_result_tables.R    # -> results/tables/*.csv
   author = {叶伟丰 and 崔雅格 and 李宗昊},
   year   = {2026},
   note   = {2026 年（第十二届）全国大学生统计建模大赛参赛作品，作品编号 TJJM20260521009377},
-  url    = {https://github.com/Yei1y/26tjjm}
+  url    = {https://github.com/Yei1y/Company-Bankruptcy-Prediction}
 }
 ```
 
