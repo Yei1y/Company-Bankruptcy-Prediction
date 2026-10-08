@@ -1,0 +1,9 @@
+"Metric","Value"
+"ROC-AUC",0.938
+"PR-AUC",0.4222
+"KS Statistic",0.7638
+"Optimal Threshold",0.0317
+"Precision (PPV)",0.2086
+"Recall (Sensitivity)",0.8947
+"F1-Score",0.3383
+"F2-Score",0.5397

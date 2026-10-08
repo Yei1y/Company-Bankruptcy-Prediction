@@ -1,0 +1,32 @@
+# 本项目为 R 为主的统计建模项目（R 4.3.2），两个 .ipynb 使用 R kernel（IRkernel）。
+# 安装：R 中执行 install.packages(c(...))；下表中的版本号为开发环境实测版本。
+
+# ---- 统计建模核心 ----
+ncvreg==3.15.0          # SCAD 惩罚回归与交叉验证
+Rcpp==1.1.0             # GCor-SIS-REDS 核矩阵计算的 C++ 加速
+doParallel==1.0.17      # MDS 多重拆分并行
+foreach==1.5.2          # 并行循环
+brglm2==1.0.1           # Bootstrap 出现完全分离时的 Firth 惩罚似然降级
+
+# ---- 模型评估 ----
+pROC==1.19.0.1          # ROC/AUC 与 Youden 最优阈值
+PRROC==1.4              # PR-AUC（不平衡数据）
+ROCR==1.0-11            # KS 统计量
+caret==7.0-1            # 混淆矩阵、F1、分层交叉验证折
+
+# ---- 对比模型 ----
+lightgbm==4.6.0         # 次要模型（黑盒基准）
+shapviz==0.10.3         # LightGBM 的 SHAP 解释
+smotefamily==1.4.0      # SMOTE 过采样 + 逻辑回归对照
+
+# ---- 数据处理与可视化 ----
+splines==4.3.2          # 自然三次样条展开（R 自带）
+Matrix==1.6-1.1
+ggplot2==4.0.0
+dplyr==1.1.4
+tidyr==1.3.1
+patchwork==1.3.0
+scales==1.4.0
+
+# ---- 笔记本运行环境（可选）----
+# IRkernel            # 在 VS Code / Jupyter 中以 R kernel 运行 notebooks/*.ipynb

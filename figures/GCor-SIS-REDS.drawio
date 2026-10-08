@@ -1,0 +1,51 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="第 1 页" id="hEUgdpLte_JczuC7Jr8y">
+    <mxGraphModel dx="-70" dy="590" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="1" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="tR4NUJef4j--NAbLJjPd-37" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;" value="1. 随机将数据集划分为两个不相交的数据集 \(D_1\) 和 \(D_2\)，样本量分别为 \(n_1 = [2n/3]\) 和 \(n_2 = n - n_1\)。" vertex="1">
+          <mxGeometry height="50" width="560" x="924" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-38" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EBEF;strokeColor=#B0B5B9;align=left;verticalAlign=top;" value="" vertex="1">
+          <mxGeometry height="130" width="560" x="924" y="690" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-39" parent="tR4NUJef4j--NAbLJjPd-38" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacingLeft=10;" value="&lt;b&gt;2. 对于 \(r \in \{1, \cdots, p\}\) 执行：&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="300" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-40" parent="tR4NUJef4j--NAbLJjPd-38" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=10;" value="分别在 \(D_1\) 和 \(D_2\) 上计算 \(\hat{\omega}_{r1}\) 和 \(\hat{\omega}_{r2}\)。" vertex="1">
+          <mxGeometry height="30" width="490" x="50" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-41" parent="tR4NUJef4j--NAbLJjPd-38" style="rounded=1;whiteSpace=wrap;html=1;align=left;spacingLeft=10;" value="计算 \(M_r\)。" vertex="1">
+          <mxGeometry height="30" width="490" x="50" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-42" edge="1" parent="tR4NUJef4j--NAbLJjPd-38" source="tR4NUJef4j--NAbLJjPd-40" target="tR4NUJef4j--NAbLJjPd-41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="30" y="55" />
+              <mxPoint x="30" y="95" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-43" parent="1" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;spacingLeft=5;" value="&lt;b&gt;3. 结束循环&lt;/b&gt;" vertex="1">
+          <mxGeometry height="20" width="100" x="924" y="835" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-44" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;" value="4. 寻找 \(t_{opt}\)。" vertex="1">
+          <mxGeometry height="40" width="560" x="924" y="870" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-45" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=10;" value="5. 获取活动预测变量 \(\hat{A}_n(t_{opt})\)。" vertex="1">
+          <mxGeometry height="40" width="560" x="924" y="930" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-46" edge="1" parent="1" source="tR4NUJef4j--NAbLJjPd-37" target="tR4NUJef4j--NAbLJjPd-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-47" edge="1" parent="1" source="tR4NUJef4j--NAbLJjPd-38" target="tR4NUJef4j--NAbLJjPd-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="tR4NUJef4j--NAbLJjPd-48" edge="1" parent="1" source="tR4NUJef4j--NAbLJjPd-44" target="tR4NUJef4j--NAbLJjPd-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

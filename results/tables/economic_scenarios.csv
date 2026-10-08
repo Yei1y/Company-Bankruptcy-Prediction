@@ -1,0 +1,3 @@
+"scenario","optimal_threshold","approved","defaults","net_profit_yuan","net_profit_10k"
+"r=5%, LGD=100%",0.0476,2025,63,35100000,3510
+"r=6%, LGD=40%",0.1304,2035,71,89440000,8944

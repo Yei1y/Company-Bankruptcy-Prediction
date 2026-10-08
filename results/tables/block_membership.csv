@@ -1,0 +1,6 @@
+"block","n_features","n_spline_cols","example"
+"Prof",20,60,"ROA.C..before.interest.and.depreciation.before.interest"
+"Lev",21,61,"Interest.bearing.debt.interest.rate"
+"Cash",21,63,"Cash.flow.rate"
+"Eff",17,51,"Inventory.and.accounts.receivable.Net.value"
+"Grow",15,45,"Net.Value.Per.Share..B."
